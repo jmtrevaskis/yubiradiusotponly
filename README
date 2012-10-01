@@ -1,0 +1,19 @@
+This patch allows Yubico Yubiradius to support OTP only authentication, functionality that gives more flexibility to the already brilliant Yubikey.
+
+Follow the below intructions to patch your Yubradius instance, currently only v3_5_1 is supported. I take no responsibility if you hose your Yubiradius server.
+
+1. download ropverify_v351.patch
+
+2. Backup your ropverify.php
+cp ropverify.php ropverify.php.bak
+
+3. Patch ropverify.php
+patch ropverify.php > ropverify_v351.patch
+
+4. The file should be complete, but you still need to enable OTP only logins.
+nano ropverify.php
+
+5. Find the line that reads,
+$otpOnlyAuthAllow = 0; //change to enable OTP only
+
+Change 0 to 1 and save the file.
