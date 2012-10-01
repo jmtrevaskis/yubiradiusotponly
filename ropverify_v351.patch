@@ -1,0 +1,47 @@
+--- ropverify.bak.php 2012-05-16 18:21:06.000000000 +0530
++++ ropverify.php    2012-05-16 20:02:56.000000000 +0530
+@@ -28,6 +28,28 @@
+ $timestamp = getHttpVal('timestamp', 0);
+ $username = strtolower(getHttpVal('user', 0));
+ $passwd = getHttpVal('password', null);
++
++
++//james vars
++$debug = 0;
++$otpOnlyAuthAllow = 0; //change to enable OTP only
++$skipLdapAuth = 0; //dont edit this one
++
++//james script, if not OTP token, then set passwd as OTP for citrix
++$passwdlen = strlen($passwd);
++if ($otpOnlyAuthAllow == 1 && $passwdlen == 44) {
++  $otp = $passwd;
++  $skipLdapAuth = 1;
++}
++
++//james debug
++if ($debug) {
++  $myLog->log(LOG_ERR, $otp);
++  $myLog->log(LOG_ERR, $passwd);
++  $myLog->log(LOG_ERR, $passwdlen);
++}
++
++
+ if($otp && $username && $passwd){
+   if($user_domain = seperatUsersAndDomain($username)){
+     $user = $user_domain[0];
+@@ -402,6 +424,15 @@
+   global $confs,$ldap_host,$ldap_port,$ldap_version,$ldap_secured,$ldap_timeout,$ldap_host1,$user_full_name;
+   $myLog->log(LOG_DEBUG, 'Authenticating with LDAP/AD...');
+
++  //james, if password length is 44, it means only token is present, so skip LDAP auth
++  global $skipLdapAuth,$debug;
++  if ($skipLdapAuth == 1) {
++    if ($debug) {
++      $myLog->log(LOG_ERR, 'skipping ldap auth');
++    }
++    return true;
++  }
++
+   // Connect to LDAP server
+   $ldap_host = $confs["ldapconf"]["host"];
+   $ldap_port = $confs["ldapconf"]["port"];
